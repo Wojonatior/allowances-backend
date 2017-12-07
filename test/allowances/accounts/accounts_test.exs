@@ -32,6 +32,10 @@ defmodule Allowances.AccountsTest do
     assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
   end
 
+  test "create_user/1 with an empty password returns error changeset" do
+    assert {:error, %Ecto.Changeset{}} = Accounts.create_user(%{email: "testing@example.com", password: nil})
+  end
+
   test "update_user/2 with valid data updates the user" do
     user = fixture(:user)
     assert {:ok, user} = Accounts.update_user(user, @update_attrs)

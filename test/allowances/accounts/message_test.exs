@@ -13,7 +13,7 @@ defmodule Allowances.Accounts.MessageTest do
   test "sends confirmation request email", %{email: email, key: key} do
     sent_email = Message.confirm_request(email, key)
     assert sent_email.subject =~ "Confirm your account"
-    assert sent_email.text_body =~ "email here http://www.example.com/confirm?key="
+    assert sent_email.text_body =~ "email here http://localhost:4000/confirm?key="
     assert_delivered_email Message.confirm_request(email, key)
   end
 
