@@ -6,7 +6,7 @@ defmodule AllowancesWeb.Router do
     plug Phauxth.Authenticate, method: :token
   end
 
-  scope "/api", AllowancesWeb do
+  scope "/auth", AllowancesWeb do
     pipe_through :api
 
     post "/sessions", SessionController, :create
@@ -14,6 +14,16 @@ defmodule AllowancesWeb.Router do
     get "/confirm", ConfirmController, :index
     post "/password_resets", PasswordResetController, :create
     put "/password_resets/update", PasswordResetController, :update
+  end
+
+
+  scope "/" do
+    pipe_through :api
+
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: AllowancesWeb.Schema,
+      interface: :simple,
+      context: %{pubsub: AllowancesWeb.Endpoint}
   end
 
 end

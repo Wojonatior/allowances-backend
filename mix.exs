@@ -41,7 +41,10 @@ defmodule Allowances.Mixfile do
       {:phauxth, "~> 1.2"},
       {:bcrypt_elixir, "~> 1.0"},
       {:bamboo, "~> 0.8"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:absinthe_ecto, "~> 0.1.3"},
+      {:absinthe_plug, "~> 1.4.1"}, 
+      {:phoenix_live_reload, "~> 1.1"}     
     ]
   end
 
