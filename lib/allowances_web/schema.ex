@@ -6,7 +6,7 @@ defmodule AllowancesWeb.Schema do
   object :user do
     field :id, non_null(:id)
     field :email, non_null(:string)
-    field :confirmed_at, non_null(:string)
+    field :confirmed_at, :string
   end
 
   query do
