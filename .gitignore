@@ -1,3 +1,9 @@
 .config
 env/
 *~
+venv
+.idea
+.vscode
+allowances.egg-info
+__pycache__
+.env

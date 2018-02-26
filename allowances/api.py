@@ -10,7 +10,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
 
 app = Flask(__name__)
 
-app.config.from_pyfile('.config')
+app.config.from_object(os.environ['APP_SETTINGS'])
 PLAID_CLIENT_ID = app.config['PLAID_CLIENT_ID']
 PLAID_SECRET = app.config['PLAID_SECRET']
 PLAID_PUBLIC_KEY = app.config['PLAID_PUBLIC_KEY']
@@ -149,9 +149,3 @@ def new_user():
     db.session.commit()
     return (jsonify({'username': user.username}), 201,
             {'Location': url_for('get_user', id=user.id, _external=True)})
-
-
-if __name__ == '__main__':
-    if not os.path.exists('db.sqlite'):
-        db.create_all()
-    app.run(debug=True)
