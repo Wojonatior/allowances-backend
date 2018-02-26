@@ -1,1 +1,1 @@
-web: gunicorn app:allowances
+web: flask run
