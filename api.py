@@ -1,12 +1,15 @@
 import os
 import datetime
 import plaid
+from schema import schema, Department
 from flask import Flask, abort, request, render_template, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
+from flask_graphql import GraphQLView
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
+from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask(__name__)
 
@@ -53,6 +56,9 @@ class User(db.Model):
         user = User.query.get(data['id'])
         return user
 
+app.add_url_rule('/graphql', view_func=GraphQLView.as_view(
+    'graphql', schema=schema, batch=True
+))
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -134,7 +140,6 @@ def get_auth_token():
     token = g.user.generate_auth_token(600)
     return jsonify({'token': token.decode('ascii'), 'duration': 600})
 
-
 @app.route('/api/users', methods=['POST'])
 def new_user():
     username = request.json.get('username')
@@ -151,7 +156,8 @@ def new_user():
             {'Location': url_for('get_user', id=user.id, _external=True)})
 
 
-if __name__ == '__main__':
+
+if(__name__ == '__main__'):
     if not os.path.exists('db.sqlite'):
         db.create_all()
     app.run(debug=True)
