@@ -1,1 +1,1 @@
-web: gunicorn -b localhost:$PORT allowances.api:app
+web: gunicorn allowances.api:app
