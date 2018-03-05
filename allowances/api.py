@@ -149,3 +149,10 @@ def new_user():
     db.session.commit()
     return (jsonify({'username': user.username}), 201,
             {'Location': url_for('get_user', id=user.id, _external=True)})
+
+
+if __name__ == '__main__':
+    if not os.path.exists('db.sqlite'):
+        db.create_all()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='127.0.0.1', port=port, debug=True)
