@@ -1,1 +1,1 @@
-free: gunicorn allowances.api:app
+web: gunicorn allowances.api:app
