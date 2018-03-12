@@ -17,21 +17,21 @@ class Config(object):
 
 class ProductionConfig(Config):
     DEBUG = False
-    PLAID_ENV = 'production'
+    PLAID_ENV = 'sandbox'
 
 
 class StagingConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    PLAID_ENV = 'staging'
+    PLAID_ENV = 'sandbox'
 
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    PLAID_ENV = 'development'
+    PLAID_ENV = 'sandbox'
 
 
 class TestingConfig(Config):
     TESTING = True
-    PLAID_ENV = 'testing'
+    PLAID_ENV = 'sandbox'
