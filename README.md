@@ -26,3 +26,7 @@ the variables as normal, no source.
 
 The PLAID keys and id in the example are the plaid sandbox versions.
 
+
+### Running locally
+
+While in your virtual env, use `gunicorn -b localhost:5000 allowances.api:app`
