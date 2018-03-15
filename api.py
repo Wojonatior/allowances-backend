@@ -1,7 +1,6 @@
 import os
 import datetime
 import plaid
-from schema import schema, Department
 from flask import Flask, abort, request, render_template, jsonify, g, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
@@ -20,45 +19,11 @@ PLAID_PUBLIC_KEY = app.config['PLAID_PUBLIC_KEY']
 PLAID_ENV = app.config['PLAID_ENV']
 
 # extensions
-db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
                       public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
 access_token = None
 public_token = None
-
-
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(), index=True)
-    password_hash = db.Column(db.String(120))
-
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
-
-    def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
-
-    def generate_auth_token(self, expiration=600):
-        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        return s.dumps({'id': self.id})
-
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None    # valid token, but expired
-        except BadSignature:
-            return None    # invalid token
-        user = User.query.get(data['id'])
-        return user
-
-app.add_url_rule('/graphql', view_func=GraphQLView.as_view(
-    'graphql', schema=schema, batch=True
-))
 
 @auth.verify_password
 def verify_password(username_or_token, password):
