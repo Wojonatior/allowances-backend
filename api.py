@@ -9,6 +9,7 @@ from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from sqlalchemy.ext.declarative import declarative_base
+from schema import schema
 
 app = Flask(__name__)
 
@@ -24,6 +25,8 @@ client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
                       public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
 access_token = None
 public_token = None
+
+app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -123,6 +126,4 @@ def new_user():
 
 
 if(__name__ == '__main__'):
-    if not os.path.exists('db.sqlite'):
-        db.create_all()
     app.run(debug=True)

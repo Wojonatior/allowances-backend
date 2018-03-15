@@ -9,7 +9,6 @@ db_session = scoped_session(sessionmaker(autocommit=False,
                                          bind=engine))
 
 Base = declarative_base()
-# We will need this for querying
 Base.query = db_session.query_property()
 
 
@@ -18,6 +17,11 @@ class Department(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    username = Column(String)
+    password_hash = Column(String)
 
 class Employee(Base):
     __tablename__ = 'employee'
