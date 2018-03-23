@@ -7,23 +7,33 @@ from models import db_session, Department as DepartmentModel, Employee as Employ
 class Department(SQLAlchemyObjectType):
     class Meta:
         model = DepartmentModel
-        interfaces = (relay.Node, )
 
 
 class Employee(SQLAlchemyObjectType):
     class Meta:
         model = EmployeeModel
-        interfaces = (relay.Node, )
 
 class User(SQLAlchemyObjectType):
     class Meta:
         model = UserModel
-        interfaces = (relay.Node, )
 
 class Query(graphene.ObjectType):
-    node = relay.Node.Field()
-    all_employees = SQLAlchemyConnectionField(Employee)
-    all_users = SQLAlchemyConnectionField(User)
+    departments = graphene.List(Department)
+    employees = graphene.List(Employee)
+    users = graphene.List(User)
+
+    def resolve_departments(self, info):
+        query = Department.get_query(info)
+        return query.all()
+
+    def resolve_employee(self, info):
+        query = Employee.get_query(info)
+        return query.all()
+
+    def resolve_users(self, info):
+        query = User.get_query(info)
+        return query.all()
+    
 
 
 schema = graphene.Schema(query=Query)
