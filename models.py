@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import (scoped_session, sessionmaker, relationship,
                             backref)
 from sqlalchemy.ext.declarative import declarative_base
+from passlib.apps import custom_app_context as pwd_context
 
 engine = create_engine('postgresql:///allowances_development', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
@@ -22,6 +23,10 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String)
     password_hash = Column(String)
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+
 
 class Employee(Base):
     __tablename__ = 'employee'
