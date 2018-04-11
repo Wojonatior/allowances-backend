@@ -1,9 +1,11 @@
 import graphene
 from graphene import relay
+from graphql import GraphQLError
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from models import db_session, Department as DepartmentModel, Employee as EmployeeModel, User as UserModel
 from passlib.apps import custom_app_context as pwd_context
 from sqlalchemy import Column, Integer, String
+from pprint import pprint
 
 
 class Department(SQLAlchemyObjectType):
@@ -34,19 +36,22 @@ class CreateUser(graphene.Mutation):
     ok = graphene.Boolean()
 
     def mutate(self, info, username, password):
-        # if username is None or password is None:
-            # abort(400)    # missing arguments
-        # if User.query.filter_by(username=username).first() is not None:
-            # abort(400)    # existing user
+        ok = False
+
+        if (username is None or password is None or
+        len(username) is 0 or len(password) is 0):
+            raise GraphQLError('username and password are required')
+        if User.get_query(info).filter_by(username=username).first() is not None:
+            raise GraphQLError('That username already exists')
+
         user = UserModel(username=username)
         user.hash_password(password)
-        ok = True
         db_session.add(user)
         db_session.commit()
+        ok = True
         return CreateUser(user=user, ok=ok)
 
 class Query(graphene.ObjectType):
-    # user = graphene.Field(User)
     node = graphene.relay.Node.Field()
     departments = graphene.List(Department)
     employees = graphene.List(Employee)
