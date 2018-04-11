@@ -21,10 +21,6 @@ class Employee(SQLAlchemyObjectType):
 class User(SQLAlchemyObjectType):
     id = graphene.ID()
     password_hash = graphene.String()
-
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
-
     class Meta:
         model = UserModel
 
@@ -50,12 +46,21 @@ class CreateUser(graphene.Mutation):
         return CreateUser(user=user, ok=ok)
 
 class Query(graphene.ObjectType):
-    user = graphene.Field(User)
+    # user = graphene.Field(User)
+    node = graphene.relay.Node.Field()
     departments = graphene.List(Department)
     employees = graphene.List(Employee)
     users = graphene.List(User)
-    department = graphene.Field(Department,
-                                id=graphene.String())
+    department = graphene.Field(Department, id=graphene.ID())
+    user = graphene.Field(User, id=graphene.ID())
+
+    def resolve_user(self, info, id):
+        query = User.get_query(info)
+        return query.get(id)
+
+    def resolve_department(self, info, id):
+        query = Department.get_query(info)
+        return query.get(id)
 
     def resolve_departments(self, info):
         query = Department.get_query(info)
@@ -69,9 +74,6 @@ class Query(graphene.ObjectType):
         query = User.get_query(info)
         return query.all()
 
-    def resolve_department(self, info, id):
-        query = Department.get_query(info)
-        return query.all()
 
 class Mutations(graphene.ObjectType):
     create_user = CreateUser.Field()
