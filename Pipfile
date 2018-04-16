@@ -28,6 +28,7 @@ Werkzeug = "==0.12.2"
 graphene = "*"
 graphene-sqlalchemy = "*"
 plaid-python = "*"
+pyjwt = "*"
 
 [dev-packages]
 

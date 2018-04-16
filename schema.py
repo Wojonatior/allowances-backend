@@ -40,7 +40,7 @@ class Login(graphene.Mutation):
         user = User.get_query(info).filter_by(username=username).first()
         if user is None:
             return Login(token=None,  ok=False, error="Username does not exist")
-        if not pwd_context.verify(password, user.password_hash):
+        if not UserModel.verify_password(password):
             return Login(token=None,  ok=False, error="Password is invalid")
         
         return Login(token="sampleToken", ok=True, error=None)
