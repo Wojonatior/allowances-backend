@@ -27,6 +27,24 @@ class User(SQLAlchemyObjectType):
         model = UserModel
 
 
+class Login(graphene.Mutation):
+    class Arguments:
+        username = graphene.String()
+        password = graphene.String()
+
+    token = graphene.String()
+    ok = graphene.Boolean()
+    error = graphene.String()
+
+    def mutate(self, info, username, password):
+        user = User.get_query(info).filter_by(username=username).first()
+        if user is None:
+            return Login(token=None,  ok=False, error="Username does not exist")
+        if not pwd_context.verify(password, user.password_hash):
+            return Login(token=None,  ok=False, error="Password is invalid")
+        
+        return Login(token="sampleToken", ok=True, error=None)
+
 class CreateUser(graphene.Mutation):
     class Arguments:
         username = graphene.String()
@@ -82,5 +100,6 @@ class Query(graphene.ObjectType):
 
 class Mutations(graphene.ObjectType):
     create_user = CreateUser.Field()
+    login = Login.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
