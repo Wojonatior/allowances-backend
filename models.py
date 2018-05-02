@@ -1,3 +1,4 @@
+import jwt
 from sqlalchemy import *
 from sqlalchemy.orm import (scoped_session, sessionmaker, relationship,
                             backref)
@@ -27,8 +28,19 @@ class User(Base):
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
 
-    def verify_password(password):
+    def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
+    
+    def generate_token(self):
+        # FIXME: pull in an actual secret token here, instead of part of a jwt payload
+        return jwt.encode({'user': self.username}, 'qwertyuiop1234567890', algorithm='HS256')
+
+    def decode_token(token):
+        return jwt.decode(token, 'qwertyuiop1234567890', algorithm='HS256')
+
+    def validate_token(self, token):
+        decode_token = decode_token(token)
+        return decoded_token == {'user': self.username}
 
 class Employee(Base):
     __tablename__ = 'employee'

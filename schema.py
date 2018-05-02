@@ -40,10 +40,21 @@ class Login(graphene.Mutation):
         user = User.get_query(info).filter_by(username=username).first()
         if user is None:
             return Login(token=None,  ok=False, error="Username does not exist")
-        if not UserModel.verify_password(password):
+        if not user.verify_password(password):
             return Login(token=None,  ok=False, error="Password is invalid")
         
-        return Login(token="sampleToken", ok=True, error=None)
+        token = user.generate_token()
+        return Login(token=token, ok=True, error=None)
+
+class Validate(graphene.Mutation):
+    class Arguments:
+        token = graphene.String()
+
+    token_contents = graphene.String()
+
+    def mutate(self, info, token):
+        token_contents = UserModel.decode_token(token)
+        return Validate(token_contents=token_contents)
 
 class CreateUser(graphene.Mutation):
     class Arguments:
@@ -101,5 +112,6 @@ class Query(graphene.ObjectType):
 class Mutations(graphene.ObjectType):
     create_user = CreateUser.Field()
     login = Login.Field()
+    validate = Validate.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
