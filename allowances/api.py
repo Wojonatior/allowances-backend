@@ -22,7 +22,6 @@ auth = HTTPBasicAuth()
 client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
                       public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
 access_token = None
-public_token = None
 
 
 class User(db.Model):
@@ -75,9 +74,16 @@ def index():
 @app.route("/get_access_token", methods=['POST'])
 def get_access_token():
     global access_token
-    public_token = request.form['public_token']
+
+    if not request.json:
+        abort(400)
+
+    public_token = request.json['public_token']
     exchange_response = client.Item.public_token.exchange(public_token)
+    print(exchange_response) # contains access_token, item_id, and request_id
     access_token = exchange_response['access_token']
+
+    # TODO: Store access_token for user.
 
     return jsonify(exchange_response)
 
