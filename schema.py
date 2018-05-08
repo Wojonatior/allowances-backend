@@ -14,7 +14,6 @@ class Department(SQLAlchemyObjectType):
     class Meta:
         model = DepartmentModel
 
-
 class Employee(SQLAlchemyObjectType):
     id = graphene.ID()
     class Meta:
@@ -22,10 +21,13 @@ class Employee(SQLAlchemyObjectType):
 
 class User(SQLAlchemyObjectType):
     id = graphene.ID()
-    password_hash = graphene.String()
     class Meta:
         model = UserModel
 
+class Viewer(SQLAlchemyObjectType):
+    token = graphene.String()
+    class Meta:
+        model = UserModel
 
 class Login(graphene.Mutation):
     class Arguments:
@@ -87,6 +89,13 @@ class Query(graphene.ObjectType):
     users = graphene.List(User)
     department = graphene.Field(Department, id=graphene.ID())
     user = graphene.Field(User, id=graphene.ID())
+    viewer = graphene.Field(Viewer, token=graphene.String())
+
+    def resolve_viewer(self, info, token):
+        query = Viewer.get_query(info)
+        token_contents = UserModel.decode_token(token)
+        pprint(token_contents['username'])
+        return query.filter_by(username=token_contents['username']).first()
 
     def resolve_user(self, info, id):
         query = User.get_query(info)

@@ -33,7 +33,7 @@ class User(Base):
     
     def generate_token(self):
         # FIXME: pull in an actual secret token here, instead of part of a jwt payload
-        return jwt.encode({'user': self.username}, 'qwertyuiop1234567890', algorithm='HS256')
+        return jwt.encode({'username': self.username}, 'qwertyuiop1234567890', algorithm='HS256')
 
     def decode_token(token):
         return jwt.decode(token, 'qwertyuiop1234567890', algorithm='HS256')
