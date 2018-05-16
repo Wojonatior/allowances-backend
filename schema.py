@@ -26,6 +26,7 @@ class User(SQLAlchemyObjectType):
 
 class Viewer(SQLAlchemyObjectType):
     token = graphene.String()
+    ok = graphene.Boolean()
     class Meta:
         model = UserModel
 
@@ -92,10 +93,16 @@ class Query(graphene.ObjectType):
     viewer = graphene.Field(Viewer, token=graphene.String())
 
     def resolve_viewer(self, info, token):
-        query = Viewer.get_query(info)
-        token_contents = UserModel.decode_token(token)
-        pprint(token_contents['username'])
-        return query.filter_by(username=token_contents['username']).first()
+        fetched_user = {}
+        try:
+            query = Viewer.get_query(info)
+            token_contents = UserModel.decode_token(token)
+            pprint(token_contents['username'])
+            fetched_user = query.filter_by(username=token_contents['username']).first()
+            fetched_user.ok = True
+        except:
+            fetched_user['ok'] = False
+        return fetched_user
 
     def resolve_user(self, info, id):
         query = User.get_query(info)
